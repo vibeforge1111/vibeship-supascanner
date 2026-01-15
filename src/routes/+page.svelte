@@ -322,7 +322,6 @@
 			<!-- Animated Laser Border Frame -->
 			<div class="absolute -inset-4 border-2 border-breach-500 animate-danger-pulse"></div>
 			<div class="absolute -inset-8 border border-supa-500/30 animate-danger-pulse" style="animation-delay: 0.5s;"></div>
-			<div class="absolute -inset-12 border border-breach-500/20 animate-danger-pulse" style="animation-delay: 1s;"></div>
 
 			<!-- Corner Laser Points -->
 			<div class="absolute -top-4 -left-4 w-3 h-3 bg-supa-400 animate-pulse shadow-lg shadow-supa-400/50"></div>

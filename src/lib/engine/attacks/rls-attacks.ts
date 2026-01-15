@@ -37,7 +37,18 @@ export const rlsAttacks: AttackVector[] = [
 		severity: 'critical',
 		tags: ['rls', 'select', 'anon', 'data-leak'],
 		execute: async (ctx: AttackContext): Promise<AttackResult> => {
-			const tables = ['users', 'profiles', 'accounts', 'settings', 'data', 'items', 'orders', 'payments'];
+			// Discover tables dynamically from OpenAPI schema
+			let discoveredTables: string[] = [];
+			try {
+				const schemaRes = await supabaseRequest(`${ctx.targetUrl}/rest/v1/`, ctx.anonKey);
+				if (schemaRes.ok) {
+					const schema = await schemaRes.json();
+					if (schema.paths) {
+						discoveredTables = Object.keys(schema.paths).filter((p: string) => p.startsWith('/') && !p.includes('{')).map((p: string) => p.slice(1));
+					}
+				}
+			} catch {}
+			const tables = [...new Set(['users', 'profiles', 'accounts', 'settings', 'data', 'items', 'orders', 'payments', ...discoveredTables])];
 			const leakedData: Record<string, unknown> = {};
 			let breached = false;
 
