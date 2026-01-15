@@ -3,6 +3,7 @@
 	import { ATTACK_CATEGORIES, SEVERITY_LEVELS, type AttackCategory, type BreachReport } from '$lib/types/attacks';
 	import { BreachEngine } from '$lib/engine/breach-engine';
 	import { ALL_ATTACKS } from '$lib/engine/attacks';
+	import { generateFixScript } from '$lib/engine/fixes';
 
 	// Engine state
 	let running = $state(false);
@@ -13,6 +14,37 @@
 
 	// Category filter
 	let selectedCategories = $state<AttackCategory[]>([]);
+
+	// Track expanded SQL code blocks
+	let expandedVulns = $state<Set<string>>(new Set());
+
+	// Toggle SQL code expansion
+	function toggleSqlCode(vulnId: string) {
+		const newSet = new Set(expandedVulns);
+		if (newSet.has(vulnId)) {
+			newSet.delete(vulnId);
+		} else {
+			newSet.add(vulnId);
+		}
+		expandedVulns = newSet;
+	}
+
+	// Download fix script for all vulnerabilities
+	function downloadFixScript() {
+		if (!report) return;
+		const vulns = report.vulnerabilities.map(v => ({
+			attackId: v.attackId,
+			title: v.title
+		}));
+		const script = generateFixScript(vulns);
+		const blob = new Blob([script], { type: 'text/sql' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `supashield-fixes-${new Date().toISOString().split('T')[0]}.sql`;
+		a.click();
+		URL.revokeObjectURL(url);
+	}
 
 	// Toggle category selection
 	function toggleCategory(cat: AttackCategory) {
@@ -106,7 +138,7 @@
 			disabled={running || !projectStore.activeProject}
 			class="btn-danger btn-lg"
 		>
-			{running ? 'Testing...' : '🔴 Run Breach Test'}
+			{running ? 'Testing...' : 'Run Breach Test'}
 		</button>
 	</div>
 
@@ -195,9 +227,14 @@
 	<!-- Vulnerabilities List -->
 	{#if report && report.vulnerabilities.length > 0}
 		<div class="mb-8">
-			<h2 class="text-lg font-bold mb-4 text-breach-400">
-				🚨 {report.vulnerabilities.length} Vulnerabilities Found
-			</h2>
+			<div class="flex items-center justify-between mb-4">
+				<h2 class="text-lg font-bold text-breach-400">
+					{report.vulnerabilities.length} Vulnerabilities Found
+				</h2>
+				<button onclick={downloadFixScript} class="btn-fix">
+					Download All Fixes (.sql)
+				</button>
+			</div>
 			<div class="space-y-4">
 				{#each report.vulnerabilities as vuln}
 					<div class="card-breach">
@@ -217,9 +254,22 @@
 							{#if vuln.fix.steps}
 								<ul class="mt-2 space-y-1">
 									{#each vuln.fix.steps as step}
-										<li class="text-xs text-gray-500">• {step}</li>
+										<li class="text-xs text-gray-500">{step}</li>
 									{/each}
 								</ul>
+							{/if}
+							{#if vuln.fix.code}
+								<div class="mt-4">
+									<button
+										onclick={() => toggleSqlCode(vuln.id)}
+										class="text-xs text-breach-400 hover:text-breach-300 flex items-center gap-1"
+									>
+										{expandedVulns.has(vuln.id) ? '[-]' : '[+]'} View SQL Fix
+									</button>
+									{#if expandedVulns.has(vuln.id)}
+										<pre class="mt-2 p-3 bg-gray-950 border border-gray-800 text-xs overflow-x-auto font-mono text-gray-300">{vuln.fix.code}</pre>
+									{/if}
+								</div>
 							{/if}
 						</div>
 					</div>
@@ -237,7 +287,7 @@
 				Add your Supabase project credentials to start testing
 			</p>
 			<a href="/settings" class="btn-primary">
-				Go to Settings →
+				Go to Settings
 			</a>
 		</div>
 	{/if}
@@ -254,6 +304,10 @@
 
 	.btn-primary {
 		@apply bg-breach-500 text-black px-4 py-2 font-medium hover:bg-breach-400 transition-colors;
+	}
+
+	.btn-fix {
+		@apply bg-secure-600 text-white px-4 py-2 text-sm font-medium hover:bg-secure-500 transition-colors;
 	}
 
 	.card {

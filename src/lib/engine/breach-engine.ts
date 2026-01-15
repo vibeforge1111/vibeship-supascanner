@@ -14,6 +14,7 @@ import type {
 	AttackSeverity
 } from '$lib/types/attacks';
 import { ATTACK_CATEGORIES, SEVERITY_LEVELS } from '$lib/types/attacks';
+import { getFixForVulnerability } from './fixes';
 
 export interface BreachEngineConfig {
 	// Max concurrent attacks
@@ -292,6 +293,9 @@ export class BreachEngine {
 	 * Create a vulnerability from a breached attack
 	 */
 	private createVulnerability(attack: AttackVector, result: AttackResult): Vulnerability {
+		// Get fix ruleset if available
+		const fixRuleset = getFixForVulnerability(attack.id);
+
 		return {
 			id: `vuln-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
 			attackId: attack.id,
@@ -301,8 +305,9 @@ export class BreachEngine {
 			description: attack.description,
 			impact: this.getImpactDescription(attack),
 			fix: {
-				summary: `Fix the ${attack.category.toUpperCase()} vulnerability`,
-				steps: this.getFixSteps(attack)
+				summary: fixRuleset?.description || `Fix the ${attack.category.toUpperCase()} vulnerability`,
+				code: fixRuleset?.sqlFix,
+				steps: fixRuleset?.steps || this.getFixSteps(attack)
 			},
 			evidence: result.evidence,
 			status: 'open',
