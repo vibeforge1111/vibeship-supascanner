@@ -15,7 +15,7 @@
 		<header class="border-b border-gray-800 bg-surface-800/90 backdrop-blur-sm sticky top-0 z-50">
 			<div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
 				<a href="/" class="flex items-center gap-2 group">
-					<span class="text-2xl">🚌</span>
+					<span class="text-2xl text-supa-400 font-bold">◈</span>
 					<span class="font-bold text-xl tracking-tight">
 						<span class="text-supa-400">Supa</span><span class="text-white group-hover:text-supa-300 transition-colors">Ralph</span>
 					</span>

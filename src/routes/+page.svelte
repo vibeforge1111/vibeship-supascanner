@@ -353,20 +353,20 @@
 		<div class="grid md:grid-cols-2 lg:grid-cols-5 gap-4">
 			<!-- Scenario Cards -->
 			{#each [
-				{ num: '01', name: 'No Security', desc: 'RLS Disabled', icon: '🔓', color: 'breach' },
-				{ num: '02', name: 'Bad RLS', desc: 'USING (true)', icon: '❌', color: 'breach' },
-				{ num: '03', name: 'Business Logic', desc: 'Price & IDOR', icon: '💰', color: 'breach' },
-				{ num: '04', name: 'Vibecoder', desc: 'AI Mistakes', icon: '🤖', color: 'supa' },
-				{ num: '05', name: 'Injection', desc: 'SQL & XSS', icon: '💉', color: 'breach' },
-				{ num: '06', name: 'GraphQL/Vault', desc: 'Secrets', icon: '🔐', color: 'breach' },
-				{ num: '07', name: 'Auth/Tenant', desc: 'Multi-tenant', icon: '👥', color: 'breach' },
-				{ num: '08', name: 'Database', desc: 'Deep Access', icon: '🗄️', color: 'breach' },
-				{ num: '09', name: 'AI/Realtime', desc: 'ML & WS', icon: '⚡', color: 'supa' },
-				{ num: '10', name: 'Backup/Logs', desc: 'Operations', icon: '📦', color: 'breach' },
+				{ num: '01', name: 'No Security', desc: 'RLS Disabled', icon: '○', color: 'breach' },
+				{ num: '02', name: 'Bad RLS', desc: 'USING (true)', icon: '×', color: 'breach' },
+				{ num: '03', name: 'Business Logic', desc: 'Price & IDOR', icon: '$', color: 'breach' },
+				{ num: '04', name: 'Vibecoder', desc: 'AI Mistakes', icon: '◇', color: 'supa' },
+				{ num: '05', name: 'Injection', desc: 'SQL & XSS', icon: '▸', color: 'breach' },
+				{ num: '06', name: 'GraphQL/Vault', desc: 'Secrets', icon: '◈', color: 'breach' },
+				{ num: '07', name: 'Auth/Tenant', desc: 'Multi-tenant', icon: '⊡', color: 'breach' },
+				{ num: '08', name: 'Database', desc: 'Deep Access', icon: '▤', color: 'breach' },
+				{ num: '09', name: 'AI/Realtime', desc: 'ML & WS', icon: '◎', color: 'supa' },
+				{ num: '10', name: 'Backup/Logs', desc: 'Operations', icon: '▢', color: 'breach' },
 			] as scenario}
 				<div class="group bg-surface-900 border border-gray-800 hover:border-{scenario.color}-500 p-4 transition-all hover:shadow-lg hover:shadow-{scenario.color}-500/20 cursor-pointer">
 					<div class="flex items-start justify-between mb-2">
-						<span class="text-2xl">{scenario.icon}</span>
+						<span class="text-2xl font-light text-gray-500 group-hover:text-{scenario.color}-400 transition-colors">{scenario.icon}</span>
 						<span class="text-xs font-mono text-gray-600 group-hover:text-{scenario.color}-400">{scenario.num}</span>
 					</div>
 					<h3 class="font-bold text-white group-hover:text-{scenario.color}-400 transition-colors">{scenario.name}</h3>
@@ -384,7 +384,7 @@
 			<!-- Feature 1 -->
 			<div class="bg-surface-800 border border-gray-800 p-6 group hover:border-breach-500 transition-all">
 				<div class="w-12 h-12 bg-breach-500/20 flex items-center justify-center mb-4 group-hover:bg-breach-500/30 transition-colors">
-					<span class="text-2xl">🔴</span>
+					<span class="text-xl text-breach-400">●</span>
 				</div>
 				<h3 class="text-xl font-bold mb-2 text-white">Active Breach Testing</h3>
 				<p class="text-gray-400 text-sm">
@@ -396,7 +396,7 @@
 			<!-- Feature 2 -->
 			<div class="bg-surface-800 border border-gray-800 p-6 group hover:border-supa-500 transition-all">
 				<div class="w-12 h-12 bg-supa-500/20 flex items-center justify-center mb-4 group-hover:bg-supa-500/30 transition-colors">
-					<span class="text-2xl">🔄</span>
+					<span class="text-xl text-supa-400">↻</span>
 				</div>
 				<h3 class="text-xl font-bold mb-2 text-white">Ralph Wiggum Loop</h3>
 				<p class="text-gray-400 text-sm">
@@ -406,9 +406,9 @@
 			</div>
 
 			<!-- Feature 3 -->
-			<div class="bg-surface-800 border border-gray-800 p-6 group hover:border-shield-500 transition-all">
-				<div class="w-12 h-12 bg-shield-500/20 flex items-center justify-center mb-4 group-hover:bg-shield-500/30 transition-colors">
-					<span class="text-2xl">✅</span>
+			<div class="bg-surface-800 border border-gray-800 p-6 group hover:border-supa-500 transition-all">
+				<div class="w-12 h-12 bg-supa-500/20 flex items-center justify-center mb-4 group-hover:bg-supa-500/30 transition-colors">
+					<span class="text-xl text-supa-400">✓</span>
 				</div>
 				<h3 class="text-xl font-bold mb-2 text-white">Fix Verification</h3>
 				<p class="text-gray-400 text-sm">
@@ -437,16 +437,16 @@
 				<p><span class="text-supa-400">$</span> suparalph scan https://your-project.supabase.co</p>
 				<p class="text-gray-500">Initializing SupaRalph v1.0.0...</p>
 				<p class="text-gray-500">Loading 252 attack vectors...</p>
-				<p class="text-yellow-400">⚡ Starting breach test...</p>
+				<p class="text-yellow-400">&gt; Starting breach test...</p>
 				<p>&nbsp;</p>
-				<p class="text-breach-400">✗ BREACHED Scenario 1: RLS Bypass - Got 3 users with SSN</p>
-				<p class="text-breach-400">✗ BREACHED Scenario 2: Bad RLS - Read 3 profiles</p>
-				<p class="text-breach-400">✗ BREACHED Scenario 4: Vibecoder - Found default credentials!</p>
-				<p class="text-breach-400">✗ BREACHED Scenario 7: Auth - 4 OAuth secrets exposed!</p>
-				<p class="text-breach-400">✗ BREACHED Scenario 9: AI - Conversations from 6 users visible!</p>
+				<p class="text-breach-400">× BREACHED Scenario 1: RLS Bypass - Got 3 users with SSN</p>
+				<p class="text-breach-400">× BREACHED Scenario 2: Bad RLS - Read 3 profiles</p>
+				<p class="text-breach-400">× BREACHED Scenario 4: Vibecoder - Found default credentials!</p>
+				<p class="text-breach-400">× BREACHED Scenario 7: Auth - 4 OAuth secrets exposed!</p>
+				<p class="text-breach-400">× BREACHED Scenario 9: AI - Conversations from 6 users visible!</p>
 				<p>&nbsp;</p>
 				<p class="text-white">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</p>
-				<p class="text-breach-400 font-bold">🚨 CRITICAL: 49 vulnerabilities found</p>
+				<p class="text-breach-400 font-bold">[!] CRITICAL: 49 vulnerabilities found</p>
 				<p class="text-gray-400">Detection Rate: <span class="text-supa-400">100%</span> | Time: 12.4s</p>
 				<p>&nbsp;</p>
 				<p><span class="text-supa-400">$</span> <span class="border-r-2 border-supa-400 animate-blink pr-1"></span></p>
@@ -458,7 +458,7 @@
 <!-- Warning Section -->
 <section class="bg-breach-900/30 border-y border-breach-800 py-12 px-4">
 	<div class="max-w-4xl mx-auto text-center">
-		<h3 class="text-2xl font-bold text-breach-400 mb-4">⚠️ For Educational & Authorized Testing Only</h3>
+		<h3 class="text-2xl font-bold text-breach-400 mb-4">[!] For Educational & Authorized Testing Only</h3>
 		<p class="text-gray-400">
 			Only test projects you own or have explicit permission to test.
 			SupaRalph performs real attacks that could affect data.
