@@ -4,6 +4,19 @@ export default {
 	theme: {
 		extend: {
 			colors: {
+				// Vibeship Design System - Teal accents
+				vibe: {
+					50: '#f0fdfa',
+					100: '#ccfbf1',
+					200: '#99f6e4',
+					300: '#5eead4',
+					400: '#2dd4bf',
+					500: '#14b8a6',
+					600: '#0d9488',
+					700: '#0f766e',
+					800: '#115e59',
+					900: '#134e4a',
+				},
 				// SupaShield brand colors
 				shield: {
 					50: '#f0fdf4',
@@ -34,10 +47,97 @@ export default {
 					100: '#dcfce7',
 					500: '#22c55e',
 					600: '#16a34a',
+				},
+				// Dark theme surfaces
+				surface: {
+					900: '#0a0a0a',
+					800: '#111111',
+					700: '#1a1a1a',
+					600: '#222222',
+					500: '#2a2a2a',
 				}
 			},
 			fontFamily: {
 				mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+			},
+			animation: {
+				'float': 'float 6s ease-in-out infinite',
+				'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
+				'slide-up': 'slide-up 0.8s ease-out',
+				'slide-in-left': 'slide-in-left 0.6s ease-out',
+				'slide-in-right': 'slide-in-right 0.6s ease-out',
+				'fade-in': 'fade-in 1s ease-out',
+				'danger-pulse': 'danger-pulse 1.5s ease-in-out infinite',
+				'scan-line': 'scan-line 2s linear infinite',
+				'glitch': 'glitch 0.3s ease-in-out infinite',
+				'typing': 'typing 3.5s steps(40, end)',
+				'blink': 'blink 1s step-end infinite',
+			},
+			keyframes: {
+				float: {
+					'0%, 100%': { transform: 'translateY(0px)' },
+					'50%': { transform: 'translateY(-20px)' },
+				},
+				'pulse-glow': {
+					'0%, 100%': { boxShadow: '0 0 20px rgba(239, 68, 68, 0.3)' },
+					'50%': { boxShadow: '0 0 40px rgba(239, 68, 68, 0.6)' },
+				},
+				'slide-up': {
+					'0%': { transform: 'translateY(50px)', opacity: '0' },
+					'100%': { transform: 'translateY(0)', opacity: '1' },
+				},
+				'slide-in-left': {
+					'0%': { transform: 'translateX(-100px)', opacity: '0' },
+					'100%': { transform: 'translateX(0)', opacity: '1' },
+				},
+				'slide-in-right': {
+					'0%': { transform: 'translateX(100px)', opacity: '0' },
+					'100%': { transform: 'translateX(0)', opacity: '1' },
+				},
+				'fade-in': {
+					'0%': { opacity: '0' },
+					'100%': { opacity: '1' },
+				},
+				'danger-pulse': {
+					'0%, 100%': {
+						borderColor: 'rgba(239, 68, 68, 0.5)',
+						boxShadow: '0 0 10px rgba(239, 68, 68, 0.2)'
+					},
+					'50%': {
+						borderColor: 'rgba(239, 68, 68, 1)',
+						boxShadow: '0 0 30px rgba(239, 68, 68, 0.5)'
+					},
+				},
+				'scan-line': {
+					'0%': { transform: 'translateY(-100%)' },
+					'100%': { transform: 'translateY(100%)' },
+				},
+				glitch: {
+					'0%, 100%': { transform: 'translate(0)' },
+					'20%': { transform: 'translate(-2px, 2px)' },
+					'40%': { transform: 'translate(-2px, -2px)' },
+					'60%': { transform: 'translate(2px, 2px)' },
+					'80%': { transform: 'translate(2px, -2px)' },
+				},
+				typing: {
+					'from': { width: '0' },
+					'to': { width: '100%' },
+				},
+				blink: {
+					'50%': { borderColor: 'transparent' },
+				},
+			},
+			// Vibeship: No rounded corners
+			borderRadius: {
+				'none': '0',
+				'sm': '0',
+				'DEFAULT': '0',
+				'md': '0',
+				'lg': '0',
+				'xl': '0',
+				'2xl': '0',
+				'3xl': '0',
+				'full': '0',
 			}
 		}
 	},
