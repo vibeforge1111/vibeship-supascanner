@@ -204,7 +204,7 @@
 		<!-- Ralph Wiggum Image with Effects -->
 		<div class="relative mb-8">
 			<!-- Title ABOVE the image -->
-			<div class="absolute -top-20 left-1/2 -translate-x-1/2 text-center whitespace-nowrap z-20">
+			<div class="absolute -top-32 left-1/2 -translate-x-1/2 text-center whitespace-nowrap z-20">
 				<h1 class="text-4xl md:text-5xl font-bold tracking-tight">
 					<span class="text-supa-400">Supa</span><span class="text-white">Ralph</span>
 				</h1>
