@@ -455,7 +455,6 @@
 
 		<!-- Secondary Links -->
 		<div class="flex gap-6 mt-6 text-sm {showContent ? 'animate-fade-in' : 'opacity-0'}" style="animation-delay: 0.7s;">
-			<span class="text-gray-500">{getTotalAttackCount()} attack vectors</span>
 			<a href="https://github.com/vibeforge1111/vibeship-supascanner" target="_blank" class="text-gray-500 hover:text-white transition-colors">
 				GitHub
 			</a>
