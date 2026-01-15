@@ -22,6 +22,86 @@
 	// Terminal output lines
 	let terminalLines = $state<{text: string; type: 'command' | 'info' | 'warning' | 'breach' | 'success' | 'error'}[]>([]);
 
+	// Demo mode attacks for testing terminal display
+	const demoAttacks = [
+		{ name: 'Anonymous SELECT All Tables', category: 'rls', severity: 'critical', breached: true },
+		{ name: 'Missing RLS Policy Detection', category: 'rls', severity: 'high', breached: true },
+		{ name: 'Horizontal Privilege Escalation', category: 'rls', severity: 'critical', breached: false },
+		{ name: 'Unauthorized INSERT', category: 'rls', severity: 'high', breached: true },
+		{ name: 'JWT Token Tampering', category: 'auth', severity: 'critical', breached: false },
+		{ name: 'Anonymous User Enumeration', category: 'auth', severity: 'medium', breached: true },
+		{ name: 'Password Reset Token Leak', category: 'auth', severity: 'critical', breached: false },
+		{ name: 'Session Fixation', category: 'auth', severity: 'high', breached: false },
+		{ name: 'Public Bucket Access', category: 'storage', severity: 'high', breached: true },
+		{ name: 'Path Traversal Upload', category: 'storage', severity: 'critical', breached: false },
+		{ name: 'Unrestricted File Types', category: 'storage', severity: 'medium', breached: true },
+		{ name: 'Hardcoded API Keys', category: 'vibecoder', severity: 'critical', breached: true },
+		{ name: 'AI-Generated SQL Injection', category: 'vibecoder', severity: 'critical', breached: false },
+		{ name: 'Cursor USING(true) Pattern', category: 'vibecoder', severity: 'critical', breached: true },
+		{ name: 'Realtime Channel Hijacking', category: 'realtime', severity: 'high', breached: false },
+		{ name: 'Broadcast Message Injection', category: 'realtime', severity: 'medium', breached: true },
+		{ name: 'Edge Function Auth Bypass', category: 'functions', severity: 'critical', breached: false },
+		{ name: 'Function Rate Limit Bypass', category: 'functions', severity: 'medium', breached: false },
+		{ name: 'GraphQL Introspection Leak', category: 'graphql', severity: 'high', breached: true },
+		{ name: 'Vault Secret Exposure', category: 'vault', severity: 'critical', breached: false },
+	];
+
+	// Run demo mode scan
+	async function runDemoScan() {
+		terminalLines = [
+			{ text: `$ suparalph scan demo.supabase.co`, type: 'command' },
+			{ text: 'Initializing SupaRalph v1.0.0...', type: 'info' },
+			{ text: '[DEMO MODE] Simulating vulnerability scan...', type: 'warning' },
+			{ text: 'Loading 252 attack vectors...', type: 'info' },
+			{ text: '> Starting breach test...', type: 'warning' }
+		];
+
+		setTimeout(() => {
+			document.getElementById('terminal-section')?.scrollIntoView({ behavior: 'smooth' });
+		}, 100);
+
+		let completed = 0;
+		let breaches = 0;
+		const total = demoAttacks.length;
+
+		for (const attack of demoAttacks) {
+			await new Promise(resolve => setTimeout(resolve, 150 + Math.random() * 200));
+
+			terminalLines = [...terminalLines, { text: `> Testing: ${attack.name}...`, type: 'info' }];
+
+			await new Promise(resolve => setTimeout(resolve, 100 + Math.random() * 150));
+
+			completed++;
+			attacksCompleted = completed;
+			scanProgress = Math.round((completed / total) * 100);
+
+			if (attack.breached) {
+				breaches++;
+				attacksFound = breaches;
+				terminalLines = [...terminalLines, {
+					text: `× BREACHED: ${attack.name} [${attack.severity.toUpperCase()}]`,
+					type: 'breach'
+				}];
+				recentBreaches = [...recentBreaches.slice(-4), {
+					title: attack.name,
+					severity: attack.severity,
+					category: attack.category
+				}];
+			} else {
+				terminalLines = [...terminalLines, { text: `  ✓ Secure: ${attack.name}`, type: 'success' }];
+			}
+		}
+
+		// Complete
+		terminalLines = [...terminalLines,
+			{ text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', type: 'info' },
+			{ text: `[!] SCAN COMPLETE: ${breaches} vulnerabilities found`, type: breaches > 0 ? 'breach' : 'success' },
+			{ text: `Detection Rate: 100% | Time: ${(total * 0.3).toFixed(1)}s`, type: 'info' },
+			{ text: '[DEMO MODE] This was a simulated scan for demonstration', type: 'warning' }
+		];
+		scanComplete = true;
+	}
+
 	// Scroll to terminal and start scan
 	async function startScan() {
 		if (!scanUrl) return;
@@ -34,6 +114,14 @@
 		scanComplete = false;
 		scanError = '';
 		recentBreaches = [];
+
+		// Check for demo mode
+		if (scanUrl.toLowerCase() === 'demo' || scanUrl.toLowerCase().includes('demo.supabase')) {
+			totalAttacks = demoAttacks.length;
+			await runDemoScan();
+			return;
+		}
+
 		terminalLines = [
 			{ text: `$ suparalph scan ${scanUrl}`, type: 'command' },
 			{ text: 'Initializing SupaRalph v1.0.0...', type: 'info' },
