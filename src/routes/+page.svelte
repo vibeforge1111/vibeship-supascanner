@@ -203,6 +203,14 @@
 
 		<!-- Ralph Wiggum Image with Effects -->
 		<div class="relative mb-8">
+			<!-- Title ABOVE the image -->
+			<div class="absolute -top-20 left-1/2 -translate-x-1/2 text-center whitespace-nowrap z-20">
+				<h1 class="text-4xl md:text-5xl font-bold tracking-tight">
+					<span class="text-supa-400">Supa</span><span class="text-white">Ralph</span>
+				</h1>
+				<p class="text-xs md:text-sm text-gray-400 mt-1 font-mono">Supabase Penetration Testing</p>
+			</div>
+
 			<!-- Animated Laser Border Frame -->
 			<div class="absolute -inset-4 border-2 border-breach-500 animate-danger-pulse"></div>
 			<div class="absolute -inset-8 border border-supa-500/30 animate-danger-pulse" style="animation-delay: 0.5s;"></div>
@@ -243,14 +251,6 @@
 				<span class="text-breach-600">"I'm in danger!"</span>
 				<div class="absolute -bottom-2 left-4 w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-white"></div>
 			</div>
-		</div>
-
-		<!-- Simple Title -->
-		<div class="text-center mb-8 {showContent ? 'animate-fade-in' : 'opacity-0'}">
-			<h1 class="text-3xl md:text-4xl font-bold tracking-tight">
-				<span class="text-supa-400">Supa</span><span class="text-white">Ralph</span>
-			</h1>
-			<p class="text-sm text-gray-500 mt-1">Supabase Penetration Testing</p>
 		</div>
 
 		<!-- Interactive Scan Form - MAIN FOCUS -->
