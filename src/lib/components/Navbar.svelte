@@ -23,7 +23,7 @@
 					Scanner
 				</a>
 				<a
-					href="https://github.com/vibeforge1111/vibeship-supascanner"
+					href="https://github.com/vibeforge1111/vibeship-suparalph"
 					target="_blank"
 					class="text-sm font-medium text-gray-400 hover:text-white transition-colors"
 				>

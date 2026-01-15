@@ -455,7 +455,7 @@
 
 		<!-- Secondary Links -->
 		<div class="flex gap-6 mt-6 text-sm {showContent ? 'animate-fade-in' : 'opacity-0'}" style="animation-delay: 0.7s;">
-			<a href="https://github.com/vibeforge1111/vibeship-supascanner" target="_blank" class="text-gray-500 hover:text-white transition-colors">
+			<a href="https://github.com/vibeforge1111/vibeship-suparalph" target="_blank" class="text-gray-500 hover:text-white transition-colors">
 				GitHub
 			</a>
 		</div>
@@ -737,7 +737,7 @@
 			<div class="flex flex-wrap items-center justify-center gap-6 text-sm">
 				<a href="/terms" class="text-gray-400 hover:text-supa-400 transition-colors">Terms of Service</a>
 				<a href="/privacy" class="text-gray-400 hover:text-supa-400 transition-colors">Privacy Policy</a>
-				<a href="https://github.com/vibeforge1111/vibeship-supascanner" target="_blank" class="text-gray-400 hover:text-white transition-colors">GitHub</a>
+				<a href="https://github.com/vibeforge1111/vibeship-suparalph" target="_blank" class="text-gray-400 hover:text-white transition-colors">GitHub</a>
 			</div>
 		</div>
 

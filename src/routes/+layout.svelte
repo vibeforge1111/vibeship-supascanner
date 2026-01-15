@@ -28,7 +28,7 @@
 						Scanner
 					</a>
 					<a
-						href="https://github.com/vibeforge1111/vibeship-supascanner"
+						href="https://github.com/vibeforge1111/vibeship-suparalph"
 						target="_blank"
 						class="transition-colors text-sm text-gray-400 hover:text-white"
 					>
@@ -61,7 +61,7 @@
 					<div class="flex items-center gap-6 text-xs">
 						<a href="/terms" class="text-gray-500 hover:text-supa-400 transition-colors">Terms of Service</a>
 						<a href="/privacy" class="text-gray-500 hover:text-supa-400 transition-colors">Privacy Policy</a>
-						<a href="https://github.com/vibeforge1111/vibeship-supascanner" target="_blank" class="text-gray-500 hover:text-white transition-colors">GitHub</a>
+						<a href="https://github.com/vibeforge1111/vibeship-suparalph" target="_blank" class="text-gray-500 hover:text-white transition-colors">GitHub</a>
 					</div>
 				</div>
 				<p class="text-xs mt-4 text-center text-gray-700">For authorized testing only. Only scan projects you own or have permission to test.</p>

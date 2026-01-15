@@ -184,7 +184,7 @@
 			<h2 class="text-2xl font-bold text-white mb-4">13. Contact</h2>
 			<p>
 				If you have questions about these Terms, please contact us through our
-				<a href="https://github.com/vibeforge1111/vibeship-supascanner" class="text-supa-400 hover:text-supa-300">GitHub repository</a>.
+				<a href="https://github.com/vibeforge1111/vibeship-suparalph" class="text-supa-400 hover:text-supa-300">GitHub repository</a>.
 			</p>
 		</section>
 	</div>
