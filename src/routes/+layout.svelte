@@ -15,16 +15,16 @@
 		<header class="border-b border-gray-800 bg-surface-800/90 backdrop-blur-sm sticky top-0 z-50">
 			<div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
 				<a href="/" class="flex items-center gap-2 group">
-					<span class="text-2xl">🛡️</span>
+					<span class="text-2xl">🚌</span>
 					<span class="font-bold text-xl tracking-tight">
-						<span class="text-vibe-400">Supa</span><span class="text-white group-hover:text-vibe-300 transition-colors">Shield</span>
+						<span class="text-supa-400">Supa</span><span class="text-white group-hover:text-supa-300 transition-colors">Ralph</span>
 					</span>
 				</a>
 				<nav class="flex items-center gap-6">
 					<a
 						href="/dashboard"
 						class="transition-colors text-sm {$page.url.pathname === '/dashboard'
-							? 'text-vibe-400'
+							? 'text-supa-400'
 							: 'text-gray-400 hover:text-white'}"
 					>
 						Dashboard
@@ -32,7 +32,7 @@
 					<a
 						href="/attacks"
 						class="transition-colors text-sm {$page.url.pathname === '/attacks'
-							? 'text-vibe-400'
+							? 'text-supa-400'
 							: 'text-gray-400 hover:text-white'}"
 					>
 						Attacks
@@ -40,7 +40,7 @@
 					<a
 						href="/settings"
 						class="transition-colors text-sm {$page.url.pathname === '/settings'
-							? 'text-vibe-400'
+							? 'text-supa-400'
 							: 'text-gray-400 hover:text-white'}"
 					>
 						Settings
@@ -50,11 +50,11 @@
 				<div class="flex items-center gap-3">
 					{#if projectStore.activeProject}
 						<div class="flex items-center gap-2 text-sm">
-							<span class="w-2 h-2 bg-vibe-500 animate-pulse"></span>
+							<span class="w-2 h-2 bg-supa-500 animate-pulse"></span>
 							<span class="text-gray-400 truncate max-w-32">{projectStore.activeProject.name}</span>
 						</div>
 					{:else}
-						<a href="/settings" class="text-sm text-vibe-400 hover:text-vibe-300 transition-colors">
+						<a href="/settings" class="text-sm text-supa-400 hover:text-supa-300 transition-colors">
 							Connect Project →
 						</a>
 					{/if}
@@ -71,7 +71,7 @@
 	<!-- Footer - Also hidden on landing page -->
 	{#if !isLandingPage}
 		<footer class="border-t border-gray-800 py-4 text-center text-sm text-gray-500 bg-surface-800">
-			<p><span class="text-vibe-400">Supa</span>Shield - Active Penetration Testing for Supabase</p>
+			<p><span class="text-supa-400">Supa</span>Ralph - Active Penetration Testing for Supabase</p>
 			<p class="text-xs mt-1 text-gray-600">Don't guess what's broken. <span class="text-breach-400">Break it and prove it.</span></p>
 		</footer>
 	{/if}

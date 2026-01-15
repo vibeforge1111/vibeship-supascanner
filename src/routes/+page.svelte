@@ -3,10 +3,16 @@
 
 	let showContent = $state(false);
 	let scanUrl = $state('');
+	let anonKey = $state('');
 	let isScanning = $state(false);
 	let scanProgress = $state(0);
 	let attacksFound = $state(0);
+	let attacksCompleted = $state(0);
+	let totalAttacks = $state(252);
 	let currentAttack = $state('');
+	let scanComplete = $state(false);
+	let scanError = $state('');
+	let recentBreaches = $state<{title: string; severity: string; category: string}[]>([]);
 
 	// Animate in content after ralph appears
 	$effect(() => {
@@ -15,49 +21,116 @@
 		}, 800);
 	});
 
-	// Simulated scan animation
+	// REAL breach test using Server-Sent Events
 	async function startScan() {
 		if (!scanUrl) return;
+
 		isScanning = true;
 		scanProgress = 0;
 		attacksFound = 0;
+		attacksCompleted = 0;
+		currentAttack = 'Initializing Ralph Wiggum Loop...';
+		scanComplete = false;
+		scanError = '';
+		recentBreaches = [];
 
-		const attacks = [
-			'RLS Bypass Detection...',
-			'Auth Token Analysis...',
-			'Storage Bucket Scan...',
-			'Edge Function Probe...',
-			'Realtime Channel Test...',
-			'Vibecoder Pattern Match...',
-			'SQL Injection Test...',
-			'SSRF Detection...',
-			'Multi-tenant Leak Check...',
-			'AI Config Exposure...',
-		];
+		try {
+			// Use SSE for real-time progress
+			const eventSource = new EventSource(
+				`/api/scan?targetUrl=${encodeURIComponent(scanUrl)}&anonKey=${encodeURIComponent(anonKey)}`
+			);
 
-		for (let i = 0; i < attacks.length; i++) {
-			currentAttack = attacks[i];
-			await new Promise(r => setTimeout(r, 300 + Math.random() * 200));
-			scanProgress = ((i + 1) / attacks.length) * 100;
-			if (Math.random() > 0.4) attacksFound++;
+			eventSource.addEventListener('scan_start', (e) => {
+				const data = JSON.parse(e.data);
+				totalAttacks = data.total;
+				currentAttack = `Starting scan against ${data.targetUrl}...`;
+			});
+
+			eventSource.addEventListener('attack_start', (e) => {
+				const data = JSON.parse(e.data);
+				currentAttack = `${data.category.toUpperCase()}: ${data.name}`;
+			});
+
+			eventSource.addEventListener('attack_complete', (e) => {
+				const data = JSON.parse(e.data);
+				attacksCompleted = data.completed;
+				scanProgress = data.progress;
+				if (data.breached) {
+					currentAttack = `🚨 BREACHED: ${data.name}`;
+				}
+			});
+
+			eventSource.addEventListener('breach_found', (e) => {
+				const data = JSON.parse(e.data);
+				attacksFound = data.totalBreaches;
+				recentBreaches = [...recentBreaches.slice(-4), {
+					title: data.title,
+					severity: data.severity,
+					category: data.category
+				}];
+			});
+
+			eventSource.addEventListener('progress', (e) => {
+				const data = JSON.parse(e.data);
+				scanProgress = data.percent;
+				attacksCompleted = data.completed;
+			});
+
+			eventSource.addEventListener('scan_complete', (e) => {
+				const data = JSON.parse(e.data);
+				scanComplete = true;
+				currentAttack = `Scan complete! Found ${data.vulnerabilities} vulnerabilities`;
+				eventSource.close();
+
+				// Redirect to dashboard after showing results
+				setTimeout(() => {
+					goto('/dashboard');
+				}, 3000);
+			});
+
+			eventSource.addEventListener('error', (e) => {
+				if (e.data) {
+					const data = JSON.parse(e.data);
+					scanError = data.message;
+				}
+				eventSource.close();
+			});
+
+			eventSource.onerror = () => {
+				if (!scanComplete) {
+					scanError = 'Connection lost. The scan may still be running.';
+				}
+				eventSource.close();
+			};
+		} catch (error) {
+			scanError = error instanceof Error ? error.message : 'Failed to start scan';
+			isScanning = false;
 		}
+	}
 
-		setTimeout(() => {
-			goto('/dashboard');
-		}, 1000);
+	// Reset scan state
+	function resetScan() {
+		isScanning = false;
+		scanProgress = 0;
+		attacksFound = 0;
+		attacksCompleted = 0;
+		currentAttack = '';
+		scanComplete = false;
+		scanError = '';
+		recentBreaches = [];
 	}
 </script>
 
 <svelte:head>
-	<title>SupaShield - "I'm in danger!" - Supabase Penetration Testing</title>
+	<title>SupaRalph - "I'm in danger!" - Supabase Penetration Testing</title>
 	<meta name="description" content="AI-powered penetration testing for Supabase. Don't guess what's broken - break it and prove it with 252 attack vectors." />
 </svelte:head>
 
 <!-- Hero Section with Ralph Wiggum -->
 <div class="relative min-h-screen bg-surface-900 overflow-hidden">
-	<!-- Animated Background Grid -->
+	<!-- Animated Background Grid - Supabase Green -->
 	<div class="absolute inset-0 opacity-20">
-		<div class="absolute inset-0" style="background-image: linear-gradient(rgba(20, 184, 166, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(20, 184, 166, 0.1) 1px, transparent 1px); background-size: 50px 50px;"></div>
+		<div class="absolute inset-0" style="background-image: linear-gradient(rgba(62, 207, 142, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(62, 207, 142, 0.1) 1px, transparent 1px); background-size: 50px 50px;"></div>
 	</div>
 
 	<!-- Scan Lines Effect -->
@@ -69,7 +142,7 @@
 	<div class="relative z-10 flex flex-col items-center justify-center min-h-screen px-4">
 
 		<!-- Ralph Wiggum Image with Effects -->
-		<div class="relative mb-8 animate-float">
+		<div class="relative mb-8">
 			<!-- Danger Glow Ring -->
 			<div class="absolute -inset-4 border-2 border-breach-500 animate-danger-pulse"></div>
 			<div class="absolute -inset-8 border border-breach-500/30 animate-danger-pulse" style="animation-delay: 0.5s;"></div>
@@ -103,7 +176,7 @@
 		<!-- Title with Staggered Animation -->
 		<div class="text-center {showContent ? 'animate-slide-up' : 'opacity-0'}">
 			<h1 class="text-5xl md:text-7xl font-bold mb-4 tracking-tight">
-				<span class="text-vibe-400">Supa</span><span class="text-white">Shield</span>
+				<span class="text-supa-400">Supa</span><span class="text-white">Ralph</span>
 			</h1>
 			<p class="text-xl md:text-2xl text-gray-400 mb-2">
 				AI-Powered Supabase <span class="text-breach-400">Penetration Testing</span>
@@ -117,7 +190,7 @@
 		<!-- Stats Bar -->
 		<div class="flex gap-8 mt-8 mb-12 {showContent ? 'animate-fade-in' : 'opacity-0'}" style="animation-delay: 0.3s;">
 			<div class="text-center">
-				<div class="text-3xl font-bold text-vibe-400">252</div>
+				<div class="text-3xl font-bold text-supa-400">252</div>
 				<div class="text-xs text-gray-500 uppercase tracking-wider">Attack Vectors</div>
 			</div>
 			<div class="text-center">
@@ -135,18 +208,18 @@
 			{#if !isScanning}
 				<div class="relative">
 					<!-- Danger Border Animation -->
-					<div class="absolute -inset-0.5 bg-gradient-to-r from-breach-500 via-vibe-500 to-breach-500 opacity-75 animate-pulse"></div>
+					<div class="absolute -inset-0.5 bg-gradient-to-r from-breach-500 via-supa-500 to-breach-500 opacity-75 animate-pulse"></div>
 
 					<div class="relative bg-surface-800 p-6">
 						<label class="block text-sm text-gray-400 mb-2 font-mono">
-							<span class="text-vibe-400">$</span> Enter your Supabase URL to start penetration test
+							<span class="text-supa-400">$</span> Enter your Supabase URL to start penetration test
 						</label>
-						<div class="flex gap-3">
+						<div class="flex gap-3 mb-3">
 							<input
 								type="text"
 								bind:value={scanUrl}
 								placeholder="https://your-project.supabase.co"
-								class="flex-1 bg-surface-900 border border-gray-700 px-4 py-3 text-white font-mono focus:border-vibe-500 focus:outline-none transition-colors"
+								class="flex-1 bg-surface-900 border border-gray-700 px-4 py-3 text-white font-mono focus:border-supa-500 focus:outline-none transition-colors"
 							/>
 							<button
 								onclick={startScan}
@@ -156,53 +229,111 @@
 								BREACH TEST
 							</button>
 						</div>
+						<!-- Optional API Key -->
+						<details class="text-sm">
+							<summary class="text-gray-500 cursor-pointer hover:text-gray-400">
+								+ Add anon key (optional, for deeper testing)
+							</summary>
+							<input
+								type="text"
+								bind:value={anonKey}
+								placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+								class="w-full mt-2 bg-surface-900 border border-gray-700 px-4 py-2 text-white font-mono text-xs focus:border-supa-500 focus:outline-none"
+							/>
+						</details>
 						<p class="text-xs text-gray-600 mt-3 font-mono">
 							⚠️ Only test projects you own or have explicit authorization to test
 						</p>
 					</div>
 				</div>
 			{:else}
-				<!-- Scanning Animation -->
+				<!-- REAL Scanning Progress -->
 				<div class="bg-surface-800 border-2 border-breach-500 animate-danger-pulse p-6">
-					<div class="flex items-center gap-4 mb-4">
-						<div class="w-4 h-4 bg-breach-500 animate-pulse"></div>
-						<span class="text-breach-400 font-bold font-mono">BREACH TEST IN PROGRESS</span>
+					<div class="flex items-center justify-between mb-4">
+						<div class="flex items-center gap-4">
+							<div class="w-4 h-4 bg-breach-500 animate-pulse"></div>
+							<span class="text-breach-400 font-bold font-mono">
+								{scanComplete ? '✓ SCAN COMPLETE' : 'RALPH WIGGUM LOOP ACTIVE'}
+							</span>
+						</div>
+						{#if !scanComplete}
+							<span class="text-xs text-gray-500 font-mono">
+								{attacksCompleted}/{totalAttacks} attacks
+							</span>
+						{/if}
 					</div>
 
 					<!-- Progress Bar -->
-					<div class="h-2 bg-surface-900 mb-4 overflow-hidden">
+					<div class="h-3 bg-surface-900 mb-4 overflow-hidden">
 						<div
-							class="h-full bg-gradient-to-r from-breach-500 to-vibe-500 transition-all duration-300"
+							class="h-full bg-gradient-to-r from-breach-500 via-breach-400 to-supa-500 transition-all duration-300 {scanComplete ? '' : 'animate-pulse'}"
 							style="width: {scanProgress}%"
 						></div>
 					</div>
 
 					<!-- Current Attack -->
-					<div class="font-mono text-sm text-gray-400 mb-4">
-						<span class="text-vibe-400">›</span> {currentAttack}
+					<div class="font-mono text-sm text-gray-400 mb-4 h-6 overflow-hidden">
+						<span class="text-supa-400">›</span> {currentAttack}
 					</div>
 
+					<!-- Error Message -->
+					{#if scanError}
+						<div class="bg-breach-900/30 border border-breach-700 p-3 mb-4 text-sm text-breach-400">
+							{scanError}
+						</div>
+					{/if}
+
 					<!-- Live Stats -->
-					<div class="flex gap-8">
+					<div class="flex gap-8 mb-4">
 						<div class="text-center">
-							<div class="text-2xl font-bold text-breach-400">{attacksFound}</div>
-							<div class="text-xs text-gray-500">BREACHES FOUND</div>
+							<div class="text-3xl font-bold text-breach-400">{attacksFound}</div>
+							<div class="text-xs text-gray-500 uppercase">Breaches Found</div>
 						</div>
 						<div class="text-center">
-							<div class="text-2xl font-bold text-vibe-400">{Math.round(scanProgress)}%</div>
-							<div class="text-xs text-gray-500">COMPLETE</div>
+							<div class="text-3xl font-bold text-supa-400">{scanProgress}%</div>
+							<div class="text-xs text-gray-500 uppercase">Complete</div>
+						</div>
+						<div class="text-center">
+							<div class="text-3xl font-bold text-gray-400">{attacksCompleted}</div>
+							<div class="text-xs text-gray-500 uppercase">Attacks Run</div>
 						</div>
 					</div>
+
+					<!-- Recent Breaches (live feed) -->
+					{#if recentBreaches.length > 0}
+						<div class="border-t border-gray-700 pt-4">
+							<div class="text-xs text-gray-500 uppercase mb-2">Recent Breaches</div>
+							<div class="space-y-1">
+								{#each recentBreaches as breach}
+									<div class="flex items-center gap-2 text-sm font-mono">
+										<span class="w-2 h-2 {breach.severity === 'critical' ? 'bg-breach-500' : breach.severity === 'high' ? 'bg-yellow-500' : 'bg-gray-500'}"></span>
+										<span class="text-gray-500">[{breach.category}]</span>
+										<span class="text-breach-400 truncate">{breach.title}</span>
+									</div>
+								{/each}
+							</div>
+						</div>
+					{/if}
+
+					<!-- Reset Button (when complete or error) -->
+					{#if scanComplete || scanError}
+						<button
+							onclick={resetScan}
+							class="mt-4 w-full py-2 border border-gray-600 text-gray-400 hover:text-white hover:border-supa-500 transition-colors text-sm"
+						>
+							Run Another Scan
+						</button>
+					{/if}
 				</div>
 			{/if}
 		</div>
 
 		<!-- CTA Buttons -->
 		<div class="flex gap-4 mt-8 {showContent ? 'animate-fade-in' : 'opacity-0'}" style="animation-delay: 0.7s;">
-			<a href="/dashboard" class="px-6 py-3 bg-vibe-600 hover:bg-vibe-500 text-white font-bold transition-all hover:shadow-lg hover:shadow-vibe-500/30">
+			<a href="/dashboard" class="px-6 py-3 bg-supa-600 hover:bg-supa-500 text-white font-bold transition-all hover:shadow-lg hover:shadow-supa-500/30">
 				View Demo Dashboard →
 			</a>
-			<a href="/attacks" class="px-6 py-3 border border-gray-600 hover:border-vibe-500 text-gray-300 hover:text-white transition-all">
+			<a href="/attacks" class="px-6 py-3 border border-gray-600 hover:border-supa-500 text-gray-300 hover:text-white transition-all">
 				Browse 252 Attacks
 			</a>
 		</div>
@@ -213,7 +344,7 @@
 <section class="bg-surface-800 py-20 px-4">
 	<div class="max-w-6xl mx-auto">
 		<h2 class="text-3xl font-bold text-center mb-4">
-			<span class="text-vibe-400">10</span> Attack Scenarios
+			<span class="text-supa-400">10</span> Attack Scenarios
 		</h2>
 		<p class="text-gray-400 text-center mb-12 max-w-2xl mx-auto">
 			Comprehensive coverage of every Supabase attack surface. Each scenario contains multiple attack vectors tested against real vulnerabilities.
@@ -225,12 +356,12 @@
 				{ num: '01', name: 'No Security', desc: 'RLS Disabled', icon: '🔓', color: 'breach' },
 				{ num: '02', name: 'Bad RLS', desc: 'USING (true)', icon: '❌', color: 'breach' },
 				{ num: '03', name: 'Business Logic', desc: 'Price & IDOR', icon: '💰', color: 'breach' },
-				{ num: '04', name: 'Vibecoder', desc: 'AI Mistakes', icon: '🤖', color: 'vibe' },
+				{ num: '04', name: 'Vibecoder', desc: 'AI Mistakes', icon: '🤖', color: 'supa' },
 				{ num: '05', name: 'Injection', desc: 'SQL & XSS', icon: '💉', color: 'breach' },
 				{ num: '06', name: 'GraphQL/Vault', desc: 'Secrets', icon: '🔐', color: 'breach' },
 				{ num: '07', name: 'Auth/Tenant', desc: 'Multi-tenant', icon: '👥', color: 'breach' },
 				{ num: '08', name: 'Database', desc: 'Deep Access', icon: '🗄️', color: 'breach' },
-				{ num: '09', name: 'AI/Realtime', desc: 'ML & WS', icon: '⚡', color: 'vibe' },
+				{ num: '09', name: 'AI/Realtime', desc: 'ML & WS', icon: '⚡', color: 'supa' },
 				{ num: '10', name: 'Backup/Logs', desc: 'Operations', icon: '📦', color: 'breach' },
 			] as scenario}
 				<div class="group bg-surface-900 border border-gray-800 hover:border-{scenario.color}-500 p-4 transition-all hover:shadow-lg hover:shadow-{scenario.color}-500/20 cursor-pointer">
@@ -263,8 +394,8 @@
 			</div>
 
 			<!-- Feature 2 -->
-			<div class="bg-surface-800 border border-gray-800 p-6 group hover:border-vibe-500 transition-all">
-				<div class="w-12 h-12 bg-vibe-500/20 flex items-center justify-center mb-4 group-hover:bg-vibe-500/30 transition-colors">
+			<div class="bg-surface-800 border border-gray-800 p-6 group hover:border-supa-500 transition-all">
+				<div class="w-12 h-12 bg-supa-500/20 flex items-center justify-center mb-4 group-hover:bg-supa-500/30 transition-colors">
 					<span class="text-2xl">🔄</span>
 				</div>
 				<h3 class="text-xl font-bold mb-2 text-white">Ralph Wiggum Loop</h3>
@@ -297,14 +428,14 @@
 			<div class="bg-surface-700 px-4 py-2 flex items-center gap-2 border-b border-gray-800">
 				<div class="w-3 h-3 bg-breach-500"></div>
 				<div class="w-3 h-3 bg-yellow-500"></div>
-				<div class="w-3 h-3 bg-shield-500"></div>
-				<span class="ml-4 text-gray-400 text-sm font-mono">supashield-scanner</span>
+				<div class="w-3 h-3 bg-supa-500"></div>
+				<span class="ml-4 text-gray-400 text-sm font-mono">suparalph-scanner</span>
 			</div>
 
 			<!-- Terminal Content -->
 			<div class="p-6 font-mono text-sm space-y-2">
-				<p><span class="text-vibe-400">$</span> supashield scan https://your-project.supabase.co</p>
-				<p class="text-gray-500">Initializing SupaShield v1.0.0...</p>
+				<p><span class="text-supa-400">$</span> suparalph scan https://your-project.supabase.co</p>
+				<p class="text-gray-500">Initializing SupaRalph v1.0.0...</p>
 				<p class="text-gray-500">Loading 252 attack vectors...</p>
 				<p class="text-yellow-400">⚡ Starting breach test...</p>
 				<p>&nbsp;</p>
@@ -316,9 +447,9 @@
 				<p>&nbsp;</p>
 				<p class="text-white">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</p>
 				<p class="text-breach-400 font-bold">🚨 CRITICAL: 49 vulnerabilities found</p>
-				<p class="text-gray-400">Detection Rate: <span class="text-vibe-400">100%</span> | Time: 12.4s</p>
+				<p class="text-gray-400">Detection Rate: <span class="text-supa-400">100%</span> | Time: 12.4s</p>
 				<p>&nbsp;</p>
-				<p><span class="text-vibe-400">$</span> <span class="border-r-2 border-vibe-400 animate-blink pr-1"></span></p>
+				<p><span class="text-supa-400">$</span> <span class="border-r-2 border-supa-400 animate-blink pr-1"></span></p>
 			</div>
 		</div>
 	</div>
@@ -330,7 +461,7 @@
 		<h3 class="text-2xl font-bold text-breach-400 mb-4">⚠️ For Educational & Authorized Testing Only</h3>
 		<p class="text-gray-400">
 			Only test projects you own or have explicit permission to test.
-			SupaShield performs real attacks that could affect data.
+			SupaRalph performs real attacks that could affect data.
 			<span class="text-breach-400">Use responsibly.</span>
 		</p>
 	</div>
@@ -346,7 +477,7 @@
 			Start your penetration test now and discover vulnerabilities before attackers do.
 		</p>
 		<div class="flex justify-center gap-4">
-			<a href="/settings" class="px-8 py-4 bg-vibe-600 hover:bg-vibe-500 text-white font-bold text-lg transition-all hover:shadow-xl hover:shadow-vibe-500/30">
+			<a href="/settings" class="px-8 py-4 bg-supa-600 hover:bg-supa-500 text-white font-bold text-lg transition-all hover:shadow-xl hover:shadow-supa-500/30">
 				Connect Your Project →
 			</a>
 			<a href="https://github.com/vibeforge1111/vibeship-supascanner" target="_blank" class="px-8 py-4 border border-gray-600 hover:border-white text-gray-300 hover:text-white transition-all">

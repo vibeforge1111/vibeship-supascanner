@@ -2,14 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-/* SupaShield + Vibeship Design System */
+/* SupaRalph Design System - Supabase Green */
 @layer base {
 	:root {
 		--color-breach: #ef4444;
 		--color-secure: #22c55e;
 		--color-warning: #f59e0b;
 		--color-info: #3b82f6;
-		--color-vibe: #14b8a6;
+		--color-supa: #3ECF8E;
 	}
 
 	html {
@@ -27,7 +27,7 @@
 
 	/* Custom Selection */
 	::selection {
-		@apply bg-vibe-500/30 text-white;
+		@apply bg-supa-500/30 text-white;
 	}
 
 	/* Scrollbar styling - Vibeship flat */
@@ -44,12 +44,12 @@
 	}
 
 	::-webkit-scrollbar-thumb:hover {
-		@apply bg-vibe-600;
+		@apply bg-supa-600;
 	}
 
 	/* Focus styles */
 	:focus-visible {
-		@apply outline-none ring-2 ring-vibe-500 ring-offset-2 ring-offset-surface-900;
+		@apply outline-none ring-2 ring-supa-500 ring-offset-2 ring-offset-surface-900;
 	}
 }
 
@@ -67,8 +67,8 @@
 		@apply bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-2 py-0.5 text-xs font-mono;
 	}
 
-	.badge-vibe {
-		@apply bg-vibe-500/20 text-vibe-400 border border-vibe-500/30 px-2 py-0.5 text-xs font-mono;
+	.badge-supa {
+		@apply bg-supa-500/20 text-supa-400 border border-supa-500/30 px-2 py-0.5 text-xs font-mono;
 	}
 
 	/* Cards */
@@ -84,8 +84,8 @@
 		@apply bg-surface-800 border-l-4 border-l-secure-500 border-y border-r border-gray-800 p-4;
 	}
 
-	.card-vibe {
-		@apply bg-surface-800 border-l-4 border-l-vibe-500 border-y border-r border-gray-800 p-4;
+	.card-supa {
+		@apply bg-surface-800 border-l-4 border-l-supa-500 border-y border-r border-gray-800 p-4;
 	}
 
 	/* Buttons */
@@ -94,7 +94,7 @@
 	}
 
 	.btn-primary {
-		@apply btn bg-vibe-600 hover:bg-vibe-500 text-white hover:shadow-lg hover:shadow-vibe-500/30;
+		@apply btn bg-supa-600 hover:bg-supa-500 text-white hover:shadow-lg hover:shadow-supa-500/30;
 	}
 
 	.btn-danger {
@@ -102,7 +102,7 @@
 	}
 
 	.btn-secondary {
-		@apply btn bg-surface-700 hover:bg-surface-600 text-gray-100 border border-gray-700 hover:border-vibe-500;
+		@apply btn bg-surface-700 hover:bg-surface-600 text-gray-100 border border-gray-700 hover:border-supa-500;
 	}
 
 	/* Code blocks */
@@ -112,7 +112,7 @@
 
 	/* Attack surface map */
 	.attack-category {
-		@apply p-4 text-center border border-gray-800 transition-all duration-200 cursor-pointer hover:border-vibe-500;
+		@apply p-4 text-center border border-gray-800 transition-all duration-200 cursor-pointer hover:border-supa-500;
 	}
 
 	.attack-category.breached {
@@ -134,7 +134,7 @@
 	input[type="password"],
 	textarea {
 		@apply bg-surface-900 border border-gray-700 px-4 py-3 text-white font-mono
-			   focus:border-vibe-500 focus:outline-none focus:ring-1 focus:ring-vibe-500
+			   focus:border-supa-500 focus:outline-none focus:ring-1 focus:ring-supa-500
 			   transition-all duration-200 placeholder:text-gray-600;
 	}
 
@@ -145,7 +145,7 @@
 
 	.glow-border::before {
 		content: '';
-		@apply absolute -inset-0.5 bg-gradient-to-r from-breach-500 via-vibe-500 to-breach-500 opacity-75;
+		@apply absolute -inset-0.5 bg-gradient-to-r from-breach-500 via-supa-500 to-breach-500 opacity-75;
 		animation: gradient-shift 3s ease infinite;
 	}
 
@@ -172,14 +172,14 @@
 	}
 
 	.scan-progress-bar {
-		@apply h-full bg-gradient-to-r from-breach-500 to-vibe-500 transition-all duration-300;
+		@apply h-full bg-gradient-to-r from-breach-500 to-supa-500 transition-all duration-300;
 	}
 
 	/* Hero section utilities */
 	.hero-grid {
 		background-image:
-			linear-gradient(rgba(20, 184, 166, 0.1) 1px, transparent 1px),
-			linear-gradient(90deg, rgba(20, 184, 166, 0.1) 1px, transparent 1px);
+			linear-gradient(rgba(62, 207, 142, 0.1) 1px, transparent 1px),
+			linear-gradient(90deg, rgba(62, 207, 142, 0.1) 1px, transparent 1px);
 		background-size: 50px 50px;
 	}
 }
@@ -187,7 +187,7 @@
 @layer utilities {
 	/* Gradient text */
 	.text-gradient {
-		@apply bg-clip-text text-transparent bg-gradient-to-r from-vibe-400 to-breach-400;
+		@apply bg-clip-text text-transparent bg-gradient-to-r from-supa-400 to-breach-400;
 	}
 
 	/* Delay utilities for staggered animations */

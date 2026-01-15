@@ -1,0 +1,183 @@
+/**
+ * SupaShield Scan API - Real breach testing endpoint
+ * Runs the Ralph Wiggum loop against target Supabase
+ */
+
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
+import { BreachEngine } from '$lib/engine/breach-engine';
+import { ALL_ATTACKS, getTotalAttackCount } from '$lib/engine/attacks';
+
+export const POST: RequestHandler = async ({ request }) => {
+	try {
+		const body = await request.json();
+		const { targetUrl, anonKey, serviceKey } = body;
+
+		if (!targetUrl) {
+			return json({ error: 'Missing targetUrl' }, { status: 400 });
+		}
+
+		// Create breach engine with callbacks for progress tracking
+		const results: any[] = [];
+		const vulnerabilities: any[] = [];
+		let completed = 0;
+		const total = getTotalAttackCount();
+
+		const engine = new BreachEngine(
+			{
+				concurrency: 5,
+				attackTimeout: 15000,
+				delayBetweenAttacks: 50,
+				stopOnBreach: false
+			},
+			{
+				onAttackComplete: (attack, result) => {
+					results.push({
+						attackId: attack.id,
+						name: attack.name,
+						category: attack.category,
+						severity: attack.severity,
+						breached: result.breached,
+						summary: result.summary
+					});
+				},
+				onVulnerabilityFound: (vuln) => {
+					vulnerabilities.push(vuln);
+				},
+				onProgress: (done, total) => {
+					completed = done;
+				}
+			}
+		);
+
+		// Run the breach test
+		const report = await engine.run(ALL_ATTACKS, {
+			targetUrl,
+			anonKey: anonKey || '',
+			serviceKey: serviceKey || ''
+		});
+
+		return json({
+			success: true,
+			report: {
+				id: report.id,
+				stats: report.stats,
+				vulnerabilities: report.vulnerabilities.length,
+				duration: report.duration,
+				byCategory: report.byCategory,
+				bySeverity: report.bySeverity
+			},
+			breaches: vulnerabilities.slice(0, 20), // Top 20 vulnerabilities
+			totalAttacks: total
+		});
+	} catch (error) {
+		console.error('Scan error:', error);
+		return json(
+			{ error: error instanceof Error ? error.message : 'Scan failed' },
+			{ status: 500 }
+		);
+	}
+};
+
+/**
+ * GET endpoint for Server-Sent Events (streaming progress)
+ */
+export const GET: RequestHandler = async ({ url }) => {
+	const targetUrl = url.searchParams.get('targetUrl');
+	const anonKey = url.searchParams.get('anonKey') || '';
+
+	if (!targetUrl) {
+		return json({ error: 'Missing targetUrl' }, { status: 400 });
+	}
+
+	// Create a readable stream for SSE
+	const stream = new ReadableStream({
+		async start(controller) {
+			const encoder = new TextEncoder();
+			const send = (event: string, data: any) => {
+				controller.enqueue(encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`));
+			};
+
+			let completed = 0;
+			const total = getTotalAttackCount();
+			const breaches: any[] = [];
+
+			const engine = new BreachEngine(
+				{
+					concurrency: 5,
+					attackTimeout: 10000,
+					delayBetweenAttacks: 30,
+					stopOnBreach: false
+				},
+				{
+					onAttackStart: (attack) => {
+						send('attack_start', {
+							id: attack.id,
+							name: attack.name,
+							category: attack.category
+						});
+					},
+					onAttackComplete: (attack, result) => {
+						completed++;
+						send('attack_complete', {
+							id: attack.id,
+							name: attack.name,
+							breached: result.breached,
+							summary: result.summary,
+							progress: Math.round((completed / total) * 100),
+							completed,
+							total
+						});
+					},
+					onVulnerabilityFound: (vuln) => {
+						breaches.push(vuln);
+						send('breach_found', {
+							id: vuln.id,
+							title: vuln.title,
+							category: vuln.category,
+							severity: vuln.severity,
+							totalBreaches: breaches.length
+						});
+					},
+					onProgress: (done, totalAttacks) => {
+						send('progress', {
+							completed: done,
+							total: totalAttacks,
+							percent: Math.round((done / totalAttacks) * 100)
+						});
+					}
+				}
+			);
+
+			try {
+				send('scan_start', { total, targetUrl });
+
+				const report = await engine.run(ALL_ATTACKS, {
+					targetUrl,
+					anonKey,
+					serviceKey: ''
+				});
+
+				send('scan_complete', {
+					stats: report.stats,
+					duration: report.duration,
+					vulnerabilities: report.vulnerabilities.length
+				});
+			} catch (error) {
+				send('error', {
+					message: error instanceof Error ? error.message : 'Scan failed'
+				});
+			} finally {
+				controller.close();
+			}
+		}
+	});
+
+	return new Response(stream, {
+		headers: {
+			'Content-Type': 'text/event-stream',
+			'Cache-Control': 'no-cache',
+			'Connection': 'keep-alive'
+		}
+	});
+};
