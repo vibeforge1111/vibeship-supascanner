@@ -1,46 +1,23 @@
 /**
- * Results Store - Stores breach test results in localStorage
+ * Results Store - Session-only storage for breach test results
+ * SECURITY: Results are NOT persisted to localStorage or any storage
+ * They only exist in memory for the current browser session
  */
 
-import { browser } from '$app/environment';
 import type { BreachReport } from '$lib/types/attacks';
 
-const STORAGE_KEY = 'supashield_results';
-const MAX_RESULTS = 50;
-
-// Load results from localStorage
-function loadResults(): BreachReport[] {
-	if (!browser) return [];
-	const stored = localStorage.getItem(STORAGE_KEY);
-	if (!stored) return [];
-	try {
-		return JSON.parse(stored);
-	} catch {
-		return [];
-	}
-}
-
-// Reactive state
-let results = $state<BreachReport[]>(loadResults());
-
-// Save to localStorage
-function saveResults() {
-	if (!browser) return;
-	// Keep only last MAX_RESULTS
-	const toSave = results.slice(0, MAX_RESULTS);
-	localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
-}
+// In-memory only - no persistence
+let results = $state<BreachReport[]>([]);
 
 /**
- * Add a new breach report
+ * Add a new breach report (session only)
  */
 export function addResult(report: BreachReport): void {
-	results = [report, ...results].slice(0, MAX_RESULTS);
-	saveResults();
+	results = [report, ...results];
 }
 
 /**
- * Get all results
+ * Get all results (current session only)
  */
 export function getResults(): BreachReport[] {
 	return results;
@@ -67,7 +44,6 @@ export function deleteResult(reportId: string): boolean {
 	const index = results.findIndex((r) => r.id === reportId);
 	if (index === -1) return false;
 	results = [...results.slice(0, index), ...results.slice(index + 1)];
-	saveResults();
 	return true;
 }
 
@@ -76,7 +52,6 @@ export function deleteResult(reportId: string): boolean {
  */
 export function clearResults(): void {
 	results = [];
-	saveResults();
 }
 
 /**
