@@ -724,7 +724,6 @@
 				<p class="text-sm text-gray-300">
 					<span class="text-yellow-400 font-bold">Finding Supabase AI:</span> In your project dashboard, go to
 					<span class="text-white">SQL Editor</span> → Look for the <span class="text-supa-400">green hexagon icon</span> in the top-right corner of the editor.
-					If you can't find it, just use ChatGPT or Claude instead - they work great too!
 				</p>
 			</div>
 		</div>
