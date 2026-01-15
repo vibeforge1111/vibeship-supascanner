@@ -355,6 +355,7 @@
 						</p>
 					</div>
 				</div>
+			</div>
 		</div>
 
 		<!-- Secondary Links -->
@@ -539,26 +540,6 @@
 			SupaRalph performs real attacks that could affect data.
 			<span class="text-breach-400">Use responsibly.</span>
 		</p>
-	</div>
-</section>
-
-<!-- Final CTA -->
-<section class="bg-surface-900 py-20 px-4">
-	<div class="max-w-4xl mx-auto text-center">
-		<h2 class="text-4xl font-bold mb-4">
-			Ready to find out if you're <span class="text-breach-400">"in danger"</span>?
-		</h2>
-		<p class="text-gray-400 mb-8">
-			Start your penetration test now and discover vulnerabilities before attackers do.
-		</p>
-		<div class="flex justify-center gap-4">
-			<a href="/settings" class="px-8 py-4 bg-supa-600 hover:bg-supa-500 text-white font-bold text-lg transition-all hover:shadow-xl hover:shadow-supa-500/30">
-				Connect Your Project →
-			</a>
-			<a href="https://github.com/vibeforge1111/vibeship-supascanner" target="_blank" class="px-8 py-4 border border-gray-600 hover:border-white text-gray-300 hover:text-white transition-all">
-				View on GitHub
-			</a>
-		</div>
 	</div>
 </section>
 
