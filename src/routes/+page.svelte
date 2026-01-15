@@ -376,7 +376,7 @@
 		</div>
 
 		<!-- Interactive Scan Form - MAIN FOCUS -->
-		<div class="w-full max-w-2xl {showContent ? 'animate-slide-up' : 'opacity-0'}" style="animation-delay: 0.5s;">
+		<div class="w-full max-w-2xl mt-12 {showContent ? 'animate-slide-up' : 'opacity-0'}" style="animation-delay: 0.5s;">
 			<div class="relative">
 					<!-- Danger Border Animation -->
 					<div class="absolute -inset-0.5 bg-gradient-to-r from-breach-500 via-supa-500 to-breach-500 opacity-75 animate-pulse"></div>
