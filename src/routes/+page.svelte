@@ -21,7 +21,10 @@
 		}, 800);
 	});
 
-	// REAL breach test using Server-Sent Events
+	// Terminal output lines
+	let terminalLines = $state<{text: string; type: 'command' | 'info' | 'warning' | 'breach' | 'success' | 'error'}[]>([]);
+
+	// Scroll to terminal and start scan
 	async function startScan() {
 		if (!scanUrl) return;
 
@@ -33,6 +36,17 @@
 		scanComplete = false;
 		scanError = '';
 		recentBreaches = [];
+		terminalLines = [
+			{ text: `$ suparalph scan ${scanUrl}`, type: 'command' },
+			{ text: 'Initializing SupaRalph v1.0.0...', type: 'info' },
+			{ text: 'Loading 252 attack vectors...', type: 'info' },
+			{ text: '> Starting breach test...', type: 'warning' }
+		];
+
+		// Scroll to terminal section
+		setTimeout(() => {
+			document.getElementById('terminal-section')?.scrollIntoView({ behavior: 'smooth' });
+		}, 100);
 
 		try {
 			// Use SSE for real-time progress
@@ -44,11 +58,13 @@
 				const data = JSON.parse(e.data);
 				totalAttacks = data.total;
 				currentAttack = `Starting scan against ${data.targetUrl}...`;
+				terminalLines = [...terminalLines, { text: `Connected to ${data.targetUrl}`, type: 'success' }];
 			});
 
 			eventSource.addEventListener('attack_start', (e) => {
 				const data = JSON.parse(e.data);
 				currentAttack = `${data.category.toUpperCase()}: ${data.name}`;
+				terminalLines = [...terminalLines, { text: `> Testing: ${data.name}...`, type: 'info' }];
 			});
 
 			eventSource.addEventListener('attack_complete', (e) => {
@@ -56,7 +72,7 @@
 				attacksCompleted = data.completed;
 				scanProgress = data.progress;
 				if (data.breached) {
-					currentAttack = `🚨 BREACHED: ${data.name}`;
+					currentAttack = `BREACHED: ${data.name}`;
 				}
 			});
 
@@ -68,6 +84,7 @@
 					severity: data.severity,
 					category: data.category
 				}];
+				terminalLines = [...terminalLines, { text: `× BREACHED: ${data.title}`, type: 'breach' }];
 			});
 
 			eventSource.addEventListener('progress', (e) => {
@@ -80,18 +97,24 @@
 				const data = JSON.parse(e.data);
 				scanComplete = true;
 				currentAttack = `Scan complete! Found ${data.vulnerabilities} vulnerabilities`;
+				terminalLines = [...terminalLines,
+					{ text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', type: 'info' },
+					{ text: `[!] SCAN COMPLETE: ${data.vulnerabilities} vulnerabilities found`, type: data.vulnerabilities > 0 ? 'breach' : 'success' },
+					{ text: `Detection Rate: 100% | Time: ${(data.duration / 1000).toFixed(1)}s`, type: 'info' }
+				];
 				eventSource.close();
 
 				// Redirect to dashboard after showing results
 				setTimeout(() => {
 					goto('/dashboard');
-				}, 3000);
+				}, 5000);
 			});
 
 			eventSource.addEventListener('error', (e) => {
 				if (e.data) {
 					const data = JSON.parse(e.data);
 					scanError = data.message;
+					terminalLines = [...terminalLines, { text: `ERROR: ${data.message}`, type: 'error' }];
 				}
 				eventSource.close();
 			});
@@ -99,6 +122,7 @@
 			eventSource.onerror = () => {
 				if (!scanComplete) {
 					scanError = 'Connection lost. The scan may still be running.';
+					terminalLines = [...terminalLines, { text: 'ERROR: Connection lost', type: 'error' }];
 				}
 				eventSource.close();
 			};
@@ -118,6 +142,9 @@
 		scanComplete = false;
 		scanError = '';
 		recentBreaches = [];
+		terminalLines = [];
+		// Scroll back to top
+		window.scrollTo({ top: 0, behavior: 'smooth' });
 	}
 </script>
 
@@ -255,8 +282,7 @@
 
 		<!-- Interactive Scan Form - MAIN FOCUS -->
 		<div class="w-full max-w-2xl {showContent ? 'animate-slide-up' : 'opacity-0'}" style="animation-delay: 0.5s;">
-			{#if !isScanning}
-				<div class="relative">
+			<div class="relative">
 					<!-- Danger Border Animation -->
 					<div class="absolute -inset-0.5 bg-gradient-to-r from-breach-500 via-supa-500 to-breach-500 opacity-75 animate-pulse"></div>
 
@@ -285,14 +311,15 @@
 								type="text"
 								bind:value={scanUrl}
 								placeholder="https://your-project.supabase.co"
-								class="flex-1 bg-surface-900 border border-gray-700 px-4 py-3 text-white font-mono focus:border-supa-500 focus:outline-none transition-colors"
+								disabled={isScanning}
+								class="flex-1 bg-surface-900 border border-gray-700 px-4 py-3 text-white font-mono focus:border-supa-500 focus:outline-none transition-colors disabled:opacity-50"
 							/>
 							<button
 								onclick={startScan}
-								disabled={!scanUrl}
+								disabled={!scanUrl || isScanning}
 								class="px-6 py-3 bg-breach-600 hover:bg-breach-500 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-bold transition-all hover:shadow-lg hover:shadow-breach-500/30"
 							>
-								BREACH TEST
+								{isScanning ? 'SCANNING...' : 'BREACH TEST'}
 							</button>
 						</div>
 						<!-- Optional API Key -->
@@ -318,8 +345,9 @@
 							<input
 								type="text"
 								bind:value={anonKey}
+								disabled={isScanning}
 								placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-								class="w-full mt-2 bg-surface-900 border border-gray-700 px-4 py-2 text-white font-mono text-xs focus:border-supa-500 focus:outline-none"
+								class="w-full mt-2 bg-surface-900 border border-gray-700 px-4 py-2 text-white font-mono text-xs focus:border-supa-500 focus:outline-none disabled:opacity-50"
 							/>
 						</details>
 						<p class="text-xs text-gray-600 mt-3 font-mono">
@@ -327,86 +355,6 @@
 						</p>
 					</div>
 				</div>
-			{:else}
-				<!-- REAL Scanning Progress -->
-				<div class="bg-surface-800 border-2 border-breach-500 animate-danger-pulse p-6">
-					<div class="flex items-center justify-between mb-4">
-						<div class="flex items-center gap-4">
-							<div class="w-4 h-4 bg-breach-500 animate-pulse"></div>
-							<span class="text-breach-400 font-bold font-mono">
-								{scanComplete ? '✓ SCAN COMPLETE' : 'RALPH WIGGUM LOOP ACTIVE'}
-							</span>
-						</div>
-						{#if !scanComplete}
-							<span class="text-xs text-gray-500 font-mono">
-								{attacksCompleted}/{totalAttacks} attacks
-							</span>
-						{/if}
-					</div>
-
-					<!-- Progress Bar -->
-					<div class="h-3 bg-surface-900 mb-4 overflow-hidden">
-						<div
-							class="h-full bg-gradient-to-r from-breach-500 via-breach-400 to-supa-500 transition-all duration-300 {scanComplete ? '' : 'animate-pulse'}"
-							style="width: {scanProgress}%"
-						></div>
-					</div>
-
-					<!-- Current Attack -->
-					<div class="font-mono text-sm text-gray-400 mb-4 h-6 overflow-hidden">
-						<span class="text-supa-400">›</span> {currentAttack}
-					</div>
-
-					<!-- Error Message -->
-					{#if scanError}
-						<div class="bg-breach-900/30 border border-breach-700 p-3 mb-4 text-sm text-breach-400">
-							{scanError}
-						</div>
-					{/if}
-
-					<!-- Live Stats -->
-					<div class="flex gap-8 mb-4">
-						<div class="text-center">
-							<div class="text-3xl font-bold text-breach-400">{attacksFound}</div>
-							<div class="text-xs text-gray-500 uppercase">Breaches Found</div>
-						</div>
-						<div class="text-center">
-							<div class="text-3xl font-bold text-supa-400">{scanProgress}%</div>
-							<div class="text-xs text-gray-500 uppercase">Complete</div>
-						</div>
-						<div class="text-center">
-							<div class="text-3xl font-bold text-gray-400">{attacksCompleted}</div>
-							<div class="text-xs text-gray-500 uppercase">Attacks Run</div>
-						</div>
-					</div>
-
-					<!-- Recent Breaches (live feed) -->
-					{#if recentBreaches.length > 0}
-						<div class="border-t border-gray-700 pt-4">
-							<div class="text-xs text-gray-500 uppercase mb-2">Recent Breaches</div>
-							<div class="space-y-1">
-								{#each recentBreaches as breach}
-									<div class="flex items-center gap-2 text-sm font-mono">
-										<span class="w-2 h-2 {breach.severity === 'critical' ? 'bg-breach-500' : breach.severity === 'high' ? 'bg-yellow-500' : 'bg-gray-500'}"></span>
-										<span class="text-gray-500">[{breach.category}]</span>
-										<span class="text-breach-400 truncate">{breach.title}</span>
-									</div>
-								{/each}
-							</div>
-						</div>
-					{/if}
-
-					<!-- Reset Button (when complete or error) -->
-					{#if scanComplete || scanError}
-						<button
-							onclick={resetScan}
-							class="mt-4 w-full py-2 border border-gray-600 text-gray-400 hover:text-white hover:border-supa-500 transition-colors text-sm"
-						>
-							Run Another Scan
-						</button>
-					{/if}
-				</div>
-			{/if}
 		</div>
 
 		<!-- Secondary Links -->
@@ -504,40 +452,83 @@
 	</div>
 </section>
 
-<!-- Terminal Section -->
-<section class="bg-surface-800 py-20 px-4">
+<!-- Terminal Section - Only shown when scanning -->
+{#if isScanning}
+<section id="terminal-section" class="bg-surface-800 py-20 px-4">
 	<div class="max-w-4xl mx-auto">
-		<div class="bg-surface-900 border border-gray-800 overflow-hidden">
+		<div class="bg-surface-900 border-2 {scanComplete ? 'border-supa-500' : 'border-breach-500 animate-danger-pulse'} overflow-hidden">
 			<!-- Terminal Header -->
-			<div class="bg-surface-700 px-4 py-2 flex items-center gap-2 border-b border-gray-800">
-				<div class="w-3 h-3 bg-breach-500"></div>
-				<div class="w-3 h-3 bg-yellow-500"></div>
-				<div class="w-3 h-3 bg-supa-500"></div>
-				<span class="ml-4 text-gray-400 text-sm font-mono">suparalph-scanner</span>
+			<div class="bg-surface-700 px-4 py-2 flex items-center justify-between border-b border-gray-800">
+				<div class="flex items-center gap-2">
+					<div class="w-3 h-3 {scanComplete ? 'bg-supa-500' : 'bg-breach-500 animate-pulse'}"></div>
+					<div class="w-3 h-3 bg-yellow-500"></div>
+					<div class="w-3 h-3 bg-supa-500"></div>
+					<span class="ml-4 text-gray-400 text-sm font-mono">suparalph-scanner</span>
+				</div>
+				<div class="flex items-center gap-4 text-xs font-mono">
+					<span class="text-gray-500">{attacksCompleted}/{totalAttacks} attacks</span>
+					<span class="text-supa-400">{scanProgress}%</span>
+				</div>
 			</div>
 
-			<!-- Terminal Content -->
-			<div class="p-6 font-mono text-sm space-y-2">
-				<p><span class="text-supa-400">$</span> suparalph scan https://your-project.supabase.co</p>
-				<p class="text-gray-500">Initializing SupaRalph v1.0.0...</p>
-				<p class="text-gray-500">Loading 252 attack vectors...</p>
-				<p class="text-yellow-400">&gt; Starting breach test...</p>
-				<p>&nbsp;</p>
-				<p class="text-breach-400">× BREACHED Scenario 1: RLS Bypass - Got 3 users with SSN</p>
-				<p class="text-breach-400">× BREACHED Scenario 2: Bad RLS - Read 3 profiles</p>
-				<p class="text-breach-400">× BREACHED Scenario 4: Vibecoder - Found default credentials!</p>
-				<p class="text-breach-400">× BREACHED Scenario 7: Auth - 4 OAuth secrets exposed!</p>
-				<p class="text-breach-400">× BREACHED Scenario 9: AI - Conversations from 6 users visible!</p>
-				<p>&nbsp;</p>
-				<p class="text-white">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</p>
-				<p class="text-breach-400 font-bold">[!] CRITICAL: 49 vulnerabilities found</p>
-				<p class="text-gray-400">Detection Rate: <span class="text-supa-400">100%</span> | Time: 12.4s</p>
-				<p>&nbsp;</p>
-				<p><span class="text-supa-400">$</span> <span class="border-r-2 border-supa-400 animate-blink pr-1"></span></p>
+			<!-- Progress Bar -->
+			<div class="h-1 bg-surface-900">
+				<div
+					class="h-full bg-gradient-to-r from-breach-500 via-breach-400 to-supa-500 transition-all duration-300"
+					style="width: {scanProgress}%"
+				></div>
+			</div>
+
+			<!-- Terminal Content - Dynamic -->
+			<div class="p-6 font-mono text-sm space-y-1 max-h-96 overflow-y-auto">
+				{#each terminalLines as line}
+					<p class="{
+						line.type === 'command' ? 'text-white' :
+						line.type === 'info' ? 'text-gray-500' :
+						line.type === 'warning' ? 'text-yellow-400' :
+						line.type === 'breach' ? 'text-breach-400' :
+						line.type === 'success' ? 'text-supa-400' :
+						line.type === 'error' ? 'text-breach-500' : 'text-gray-400'
+					}">
+						{#if line.type === 'command'}<span class="text-supa-400">$</span> {line.text.slice(2)}{:else}{line.text}{/if}
+					</p>
+				{/each}
+				{#if !scanComplete && !scanError}
+					<p><span class="text-supa-400">$</span> <span class="border-r-2 border-supa-400 animate-blink pr-1"></span></p>
+				{/if}
+			</div>
+
+			<!-- Stats Bar -->
+			<div class="bg-surface-700 px-6 py-4 border-t border-gray-800">
+				<div class="flex items-center justify-between">
+					<div class="flex gap-8">
+						<div class="text-center">
+							<div class="text-2xl font-bold text-breach-400">{attacksFound}</div>
+							<div class="text-xs text-gray-500 uppercase">Breaches</div>
+						</div>
+						<div class="text-center">
+							<div class="text-2xl font-bold text-supa-400">{scanProgress}%</div>
+							<div class="text-xs text-gray-500 uppercase">Complete</div>
+						</div>
+						<div class="text-center">
+							<div class="text-2xl font-bold text-gray-400">{attacksCompleted}</div>
+							<div class="text-xs text-gray-500 uppercase">Tested</div>
+						</div>
+					</div>
+					{#if scanComplete || scanError}
+						<button
+							onclick={resetScan}
+							class="px-4 py-2 border border-gray-600 text-gray-400 hover:text-white hover:border-supa-500 transition-colors text-sm"
+						>
+							Run Another Scan
+						</button>
+					{/if}
+				</div>
 			</div>
 		</div>
 	</div>
 </section>
+{/if}
 
 <!-- Warning Section -->
 <section class="bg-breach-900/30 border-y border-breach-800 py-12 px-4">
