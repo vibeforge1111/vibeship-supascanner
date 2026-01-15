@@ -73,6 +73,7 @@
 		<footer class="border-t border-gray-800 py-4 text-center text-sm text-gray-500 bg-surface-800">
 			<p><span class="text-supa-400">Supa</span>Ralph - Active Penetration Testing for Supabase</p>
 			<p class="text-xs mt-1 text-gray-600">Don't guess what's broken. <span class="text-breach-400">Break it and prove it.</span></p>
+			<p class="text-xs mt-2 text-gray-700">For authorized testing only. Only scan projects you own or have permission to test.</p>
 		</footer>
 	{/if}
 </div>
