@@ -211,9 +211,25 @@
 					<div class="absolute -inset-0.5 bg-gradient-to-r from-breach-500 via-supa-500 to-breach-500 opacity-75 animate-pulse"></div>
 
 					<div class="relative bg-surface-800 p-6">
-						<label class="block text-sm text-gray-400 mb-2 font-mono">
-							<span class="text-supa-400">$</span> Enter your Supabase URL to start penetration test
-						</label>
+						<div class="flex items-center gap-2 mb-2">
+							<label class="block text-sm text-gray-400 font-mono">
+								<span class="text-supa-400">$</span> Enter your Supabase URL to start penetration test
+							</label>
+							<!-- URL Help Tooltip -->
+							<div class="relative group/help">
+								<span class="text-gray-600 hover:text-supa-400 cursor-help text-xs">[?]</span>
+								<div class="absolute bottom-full left-0 mb-2 w-72 p-3 bg-surface-900 border border-gray-700 text-xs text-gray-300 opacity-0 invisible group-hover/help:opacity-100 group-hover/help:visible transition-all z-50">
+									<p class="font-bold text-supa-400 mb-2">Where to find your Supabase URL:</p>
+									<ol class="list-decimal list-inside space-y-1 text-gray-400">
+										<li>Go to <span class="text-white">supabase.com/dashboard</span></li>
+										<li>Select your project</li>
+										<li>Click <span class="text-white">Settings</span> → <span class="text-white">API</span></li>
+										<li>Copy the <span class="text-white">Project URL</span></li>
+									</ol>
+									<p class="mt-2 text-gray-500">Format: https://xxxxx.supabase.co</p>
+								</div>
+							</div>
+						</div>
 						<div class="flex gap-3 mb-3">
 							<input
 								type="text"
@@ -231,8 +247,23 @@
 						</div>
 						<!-- Optional API Key -->
 						<details class="text-sm">
-							<summary class="text-gray-500 cursor-pointer hover:text-gray-400">
-								+ Add anon key (optional, for deeper testing)
+							<summary class="text-gray-500 cursor-pointer hover:text-gray-400 flex items-center gap-2">
+								<span>+ Add anon key (optional, for deeper testing)</span>
+								<!-- Anon Key Help Tooltip -->
+								<div class="relative group/anonhelp inline-block">
+									<span class="text-gray-600 hover:text-supa-400 cursor-help text-xs">[?]</span>
+									<div class="absolute bottom-full left-0 mb-2 w-72 p-3 bg-surface-900 border border-gray-700 text-xs text-gray-300 opacity-0 invisible group-hover/anonhelp:opacity-100 group-hover/anonhelp:visible transition-all z-50">
+										<p class="font-bold text-supa-400 mb-2">Where to find your anon key:</p>
+										<ol class="list-decimal list-inside space-y-1 text-gray-400">
+											<li>Go to <span class="text-white">supabase.com/dashboard</span></li>
+											<li>Select your project</li>
+											<li>Click <span class="text-white">Settings</span> → <span class="text-white">API</span></li>
+											<li>Copy <span class="text-white">anon public</span> key</li>
+										</ol>
+										<p class="mt-2 text-gray-500">Starts with: eyJhbGciOiJIUzI1...</p>
+										<p class="mt-1 text-yellow-500/80">This key is safe to use - it's public</p>
+									</div>
+								</div>
 							</summary>
 							<input
 								type="text"
@@ -242,7 +273,7 @@
 							/>
 						</details>
 						<p class="text-xs text-gray-600 mt-3 font-mono">
-							⚠️ Only test projects you own or have explicit authorization to test
+							[!] Only test projects you own or have explicit authorization to test
 						</p>
 					</div>
 				</div>
