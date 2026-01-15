@@ -16,6 +16,7 @@
 	let recentBreaches = $state<{title: string; severity: string; category: string}[]>([]);
 	let allBreaches = $state<{title: string; severity: string; category: string}[]>([]); // All breaches for copy feature
 	let scanDuration = $state(0);
+	let copiedFindings = $state(false);
 
 	// Animate in content after ralph appears
 	$effect(() => {
@@ -694,12 +695,17 @@
 						).join('\n');
 						const text = `I ran a security scan on my Supabase project and found ${allBreaches.length} vulnerabilities:\n\n${findings}\n\nPlease help me fix these security issues. Show me the SQL to:\n1. Enable proper RLS policies\n2. Fix any unsafe configurations\n3. Secure my database`;
 						navigator.clipboard.writeText(text);
-						alert(`Copied ${allBreaches.length} findings! Paste into ChatGPT, Claude, or Supabase AI`);
+						copiedFindings = true;
+						setTimeout(() => { copiedFindings = false; }, 2000);
 					}}
-					class="px-6 py-3 bg-supa-600 hover:bg-supa-500 text-white font-bold transition-all hover:shadow-lg hover:shadow-supa-500/30 flex items-center gap-2"
+					class="px-6 py-3 {copiedFindings ? 'bg-supa-700' : 'bg-supa-600 hover:bg-supa-500'} text-white font-bold transition-all hover:shadow-lg hover:shadow-supa-500/30 flex items-center gap-2"
 				>
-					<span>Copy Findings for AI</span>
-					<span class="text-supa-200">({attacksFound} issues)</span>
+					{#if copiedFindings}
+						<span>✓ Copied!</span>
+					{:else}
+						<span>Copy Findings for AI</span>
+						<span class="text-supa-200">({attacksFound} issues)</span>
+					{/if}
 				</button>
 
 				<a
