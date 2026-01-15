@@ -245,37 +245,15 @@
 			</div>
 		</div>
 
-		<!-- Title with Staggered Animation -->
-		<div class="text-center {showContent ? 'animate-slide-up' : 'opacity-0'}">
-			<h1 class="text-5xl md:text-7xl font-bold mb-4 tracking-tight">
+		<!-- Simple Title -->
+		<div class="text-center mb-8 {showContent ? 'animate-fade-in' : 'opacity-0'}">
+			<h1 class="text-3xl md:text-4xl font-bold tracking-tight">
 				<span class="text-supa-400">Supa</span><span class="text-white">Ralph</span>
 			</h1>
-			<p class="text-xl md:text-2xl text-gray-400 mb-2">
-				AI-Powered Supabase <span class="text-breach-400">Penetration Testing</span>
-			</p>
-			<p class="text-gray-500 max-w-xl mx-auto font-mono text-sm">
-				Don't tell vibe coders what <em>might</em> be broken.<br/>
-				<span class="text-breach-400 font-semibold">Break it and prove it with 252 attack vectors.</span>
-			</p>
+			<p class="text-sm text-gray-500 mt-1">Supabase Penetration Testing</p>
 		</div>
 
-		<!-- Stats Bar -->
-		<div class="flex gap-8 mt-8 mb-12 {showContent ? 'animate-fade-in' : 'opacity-0'}" style="animation-delay: 0.3s;">
-			<div class="text-center">
-				<div class="text-3xl font-bold text-supa-400">252</div>
-				<div class="text-xs text-gray-500 uppercase tracking-wider">Attack Vectors</div>
-			</div>
-			<div class="text-center">
-				<div class="text-3xl font-bold text-breach-400">100%</div>
-				<div class="text-xs text-gray-500 uppercase tracking-wider">Detection Rate</div>
-			</div>
-			<div class="text-center">
-				<div class="text-3xl font-bold text-shield-400">10</div>
-				<div class="text-xs text-gray-500 uppercase tracking-wider">Scenarios</div>
-			</div>
-		</div>
-
-		<!-- Interactive Scan Form -->
+		<!-- Interactive Scan Form - MAIN FOCUS -->
 		<div class="w-full max-w-2xl {showContent ? 'animate-slide-up' : 'opacity-0'}" style="animation-delay: 0.5s;">
 			{#if !isScanning}
 				<div class="relative">
@@ -431,13 +409,16 @@
 			{/if}
 		</div>
 
-		<!-- CTA Buttons -->
-		<div class="flex gap-4 mt-8 {showContent ? 'animate-fade-in' : 'opacity-0'}" style="animation-delay: 0.7s;">
-			<a href="/dashboard" class="px-6 py-3 bg-supa-600 hover:bg-supa-500 text-white font-bold transition-all hover:shadow-lg hover:shadow-supa-500/30">
-				View Demo Dashboard →
+		<!-- Secondary Links -->
+		<div class="flex gap-6 mt-6 text-sm {showContent ? 'animate-fade-in' : 'opacity-0'}" style="animation-delay: 0.7s;">
+			<a href="/dashboard" class="text-gray-500 hover:text-supa-400 transition-colors">
+				Dashboard
 			</a>
-			<a href="/attacks" class="px-6 py-3 border border-gray-600 hover:border-supa-500 text-gray-300 hover:text-white transition-all">
-				Browse 252 Attacks
+			<a href="/attacks" class="text-gray-500 hover:text-supa-400 transition-colors">
+				252 Attacks
+			</a>
+			<a href="https://github.com/vibeforge1111/vibeship-supascanner" target="_blank" class="text-gray-500 hover:text-white transition-colors">
+				GitHub
 			</a>
 		</div>
 	</div>
