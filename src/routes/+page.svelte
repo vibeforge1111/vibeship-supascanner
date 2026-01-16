@@ -841,7 +841,7 @@
 				© {new Date().getFullYear()} SupaRalph. Open source under MIT License.
 			</p>
 			<p class="text-xs text-gray-500 mt-2">
-				Part of the <a href="https://vibeship.co" target="_blank" class="text-supa-400 hover:text-supa-300">Vibeship</a> ecosystem — tools built for vibe coders.
+				Part of the <a href="https://vibeship.co" target="_blank" class="text-supa-400 hover:text-supa-300">Vibeship</a> ecosystem — useful tools built for vibe coders.
 			</p>
 		</div>
 	</div>
