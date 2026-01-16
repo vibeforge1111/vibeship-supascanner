@@ -534,9 +534,7 @@
 		<!-- Vibe Coder Message -->
 		<div class="text-center mt-6 max-w-lg {showContent ? 'animate-fade-in' : 'opacity-0'}" style="animation-delay: 0.6s;">
 			<p class="text-sm text-gray-400">
-				<span class="text-supa-400 font-semibold">Built for vibe coders.</span> LLMs ship fast but miss security holes.
-				<br class="hidden sm:block" />
-				Need more scans besides Supabase? <a href="https://scanner.vibeship.co" target="_blank" class="text-supa-400 hover:text-supa-300 underline">scanner.vibeship.co</a> scans <span class="text-white">3,500+ rulesets</span> with <span class="text-white">16 scanners</span>, that's free too.
+				LLMs miss security holes, we need to patch them before hackers. Utilize <a href="https://scanner.vibeship.co" target="_blank" class="text-supa-400 hover:text-supa-300 underline">scanner.vibeship.co</a> too. It scans <span class="text-white">3,500+ rulesets</span>, with <span class="text-white">16 industry standard scanners</span>, free again. <span class="text-supa-400 font-semibold">Built for vibe coders.</span>
 			</p>
 		</div>
 
