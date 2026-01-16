@@ -809,9 +809,9 @@
 	<div class="max-w-6xl mx-auto">
 		<div class="flex flex-col md:flex-row items-center justify-between gap-6">
 			<!-- Brand -->
-			<div class="flex items-center gap-2">
-				<span class="text-2xl text-supa-400 font-bold">◈</span>
-				<span class="font-bold text-xl tracking-tight">
+			<div class="flex items-center gap-1">
+				<span class="text-2xl text-supa-400 font-bold leading-none">◈</span>
+				<span class="font-bold text-xl tracking-tight leading-none -mt-0.5">
 					<span class="text-supa-400">Supa</span><span class="text-white">Ralph</span>
 				</span>
 			</div>
