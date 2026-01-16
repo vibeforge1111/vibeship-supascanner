@@ -118,15 +118,66 @@
 	async function startScan() {
 		if (!scanUrl) return;
 
-		// Validate URL format - must be a proper URL with protocol
+		// Check for demo mode first (before URL validation)
+		if (scanUrl.toLowerCase() === 'demo' || scanUrl.toLowerCase().includes('demo.supabase')) {
+			isScanning = true;
+			scanProgress = 0;
+			attacksFound = 0;
+			attacksCompleted = 0;
+			currentAttack = 'Initializing Ralph Wiggum Loop...';
+			scanComplete = false;
+			scanError = '';
+			recentBreaches = [];
+			allBreaches = [];
+			totalAttacks = demoAttacks.length;
+			await runDemoScan();
+			return;
+		}
+
+		// Auto-fix URL format - add https:// and .supabase.co if missing
+		let fixedUrl = scanUrl.trim();
+
+		// Remove any trailing slashes
+		fixedUrl = fixedUrl.replace(/\/+$/, '');
+
+		// Add https:// if no protocol
+		if (!fixedUrl.startsWith('http://') && !fixedUrl.startsWith('https://')) {
+			fixedUrl = 'https://' + fixedUrl;
+		}
+
+		// Add .supabase.co if it looks like just a project ID
 		try {
-			const url = new URL(scanUrl);
-			if (!['http:', 'https:'].includes(url.protocol)) {
-				scanError = 'Please enter a valid URL starting with http:// or https://';
-				return;
+			const url = new URL(fixedUrl);
+			// If hostname doesn't contain a dot (e.g., just "myproject"), add .supabase.co
+			if (!url.hostname.includes('.')) {
+				fixedUrl = `https://${url.hostname}.supabase.co`;
+			}
+			// If hostname is like "myproject.supabase" without .co, fix it
+			else if (url.hostname.endsWith('.supabase')) {
+				fixedUrl = `https://${url.hostname}.co`;
 			}
 		} catch {
-			scanError = 'Please enter a valid Supabase project URL (e.g., https://xyz.supabase.co)';
+			// If still invalid, try adding .supabase.co
+			const projectId = fixedUrl.replace('https://', '').replace('http://', '');
+			if (projectId && !projectId.includes('.')) {
+				fixedUrl = `https://${projectId}.supabase.co`;
+			}
+		}
+
+		// Update the input with fixed URL
+		scanUrl = fixedUrl;
+
+		// Quick reachability check BEFORE scrolling down
+		// Use no-cors to bypass CORS - we just want to know if server exists
+		try {
+			const checkResponse = await Promise.race([
+				fetch(`${fixedUrl}/rest/v1/`, { method: 'HEAD', mode: 'no-cors' }),
+				new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
+			]);
+			// If we get here, server is reachable (no-cors returns opaque response)
+		} catch {
+			// Server unreachable - show error WITHOUT scrolling down
+			scanError = 'This Supabase instance appears to be unreachable. Please check the URL.';
 			return;
 		}
 
@@ -140,13 +191,6 @@
 		recentBreaches = [];
 		allBreaches = [];
 
-		// Check for demo mode
-		if (scanUrl.toLowerCase() === 'demo' || scanUrl.toLowerCase().includes('demo.supabase')) {
-			totalAttacks = demoAttacks.length;
-			await runDemoScan();
-			return;
-		}
-
 		// Update total attacks from actual attack count
 		totalAttacks = getTotalAttackCount();
 
@@ -157,7 +201,7 @@
 			{ text: '> Starting breach test (client-side)...', type: 'warning' }
 		];
 
-		// Scroll to terminal section
+		// Scroll to terminal section - only if we passed the reachability check
 		setTimeout(() => {
 			document.getElementById('terminal-section')?.scrollIntoView({ behavior: 'smooth' });
 		}, 100);
@@ -447,6 +491,9 @@
 								{isScanning ? 'SCANNING...' : 'BREACH TEST'}
 							</button>
 						</div>
+						{#if scanError && !isScanning}
+							<p class="text-breach-400 text-sm mb-3">{scanError}</p>
+						{/if}
 						<!-- Optional API Key -->
 						<details class="text-sm">
 							<summary class="text-gray-500 cursor-pointer hover:text-gray-400 flex items-center gap-2">
